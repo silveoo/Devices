@@ -17,6 +17,7 @@
 <body>
 <h1>Отчет для устройства: <span th:text="${report.deviceName}"></span></h1>
 <p>ID инстанса: <span th:text="${report.instanceId}"></span></p>
+<p>Тестировщик: <span th:text="${report.testerName}"></span></p>
 
 <h2>Ожидаемые параметры</h2>
 <table>
@@ -42,16 +43,22 @@
     </tr>
 </table>
 
-<h2>Расхождения</h2>
-<table class="discrepancies">
-    <tr>
-        <th>Параметр</th>
-        <th>Описание</th>
-    </tr>
-    <tr th:each="entry : ${report.discrepancies}">
-        <td th:text="${entry.key}"></td>
-        <td th:text="${entry.value}"></td>
-    </tr>
-</table>
+<!-- Только если есть расхождения -->
+<th:block th:if="${not report.discrepancies.isEmpty()}">
+    <h2>Расхождения</h2>
+    <table class="discrepancies">
+        <tr>
+            <th>Параметр</th>
+            <th>Описание</th>
+        </tr>
+        <tr th:each="entry : ${report.discrepancies}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+    </table>
+</th:block>
+<th:block th:if="${report.discrepancies.isEmpty()}">
+    <p style="color: #27ae60;">✓ Все параметры соответствуют требованиям</p>
+</th:block>
 </body>
 </html>
