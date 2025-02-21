@@ -83,6 +83,8 @@ public class DeviceInstanceService {
                             case GREATER_THAN -> ">" + template.getValue();
                             case LESS_THAN -> "<" + template.getValue();
                             case EQUALS, EQUALS_STRING -> template.getValue();
+                            case BOOLEAN -> "Должно быть: " + template.getValue();
+                            case NOT_EQUALS -> "Не должно быть: " + template.getValue();
                             default -> template.getValue() != null ? template.getValue() : "N/A";
                         }
                 ));

@@ -49,6 +49,8 @@ public class DeviceValidationService {
                 case RANGE -> validateRange(actualValue, template);
                 case DEVIATION -> validateDeviation(actualValue, template);
                 case ENUM -> validateEnum(actualValue, template);
+                case BOOLEAN -> validateBoolean(template, actualValue);
+                case NOT_EQUALS -> !actualValue.equalsIgnoreCase(template.getValue());
             };
         } catch (NumberFormatException e) {
             return false; // Если что-то пошло не так, значение невалидное
@@ -76,5 +78,22 @@ public class DeviceValidationService {
 
         List<String> allowed = Arrays.asList(template.getAllowedValues().split("\\s*,\\s*"));
         return allowed.contains(actualValue.trim());
+    }
+
+    private boolean validateBoolean(DeviceParameterTemplate template, String actualValue) {
+        // Приводим к нижнему регистру для унификации
+        String expected = template.getValue().toLowerCase();
+        String actual = actualValue.toLowerCase();
+
+        // Проверяем, что оба значения - boolean
+        if (!isValidBoolean(expected) || !isValidBoolean(actual)) {
+            return false;
+        }
+
+        return Boolean.parseBoolean(expected) == Boolean.parseBoolean(actual);
+    }
+
+    private boolean isValidBoolean(String value) {
+        return value.equals("true") || value.equals("false");
     }
 }
