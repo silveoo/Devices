@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/report")
@@ -69,6 +70,22 @@ public class ReportController {
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=device-type-report.pdf")
+                .body(pdfBytes);
+    }
+
+    @GetMapping(value = "/all-device-types/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PreAuthorize("hasAnyAuthority('report:generate')")
+    public ResponseEntity<byte[]> generateAllDeviceTypesReport() throws IOException {
+        List<DeviceType> allDeviceTypes = deviceTypeRepository  .findAll(); // Предполагаем наличие метода findAll()
+
+        if (allDeviceTypes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет устройств в базе");
+        }
+
+        byte[] pdfBytes = pdfReportService.generateAllDeviceTypesReport(allDeviceTypes);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=all-devices-report.pdf")
                 .body(pdfBytes);
     }
 }

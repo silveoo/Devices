@@ -19,6 +19,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,6 +63,37 @@ public class PdfReportService {
         context.setVariable("formattedParameters", formattedParameters);
 
         String html = templateEngine.process("device_type_report_template", context);
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.getFontResolver().addFont(
+                    "static/fonts/arial.ttf",
+                    "Identity-H",
+                    true
+            );
+            renderer.setDocumentFromString(html);
+            renderer.layout();
+            renderer.createPDF(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
+    public byte[] generateAllDeviceTypesReport(List<DeviceType> deviceTypes) throws IOException, DocumentException {
+        // Форматируем параметры для всех устройств
+        List<Map<String, Object>> formattedDeviceTypes = deviceTypes.stream()
+                .map(deviceType -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("name", deviceType.getName());
+                    data.put("description", deviceType.getDescription());
+                    data.put("parameters", formatDeviceParameters(deviceType.getParameters()));
+                    return data;
+                })
+                .collect(Collectors.toList());
+
+        Context context = new Context();
+        context.setVariable("deviceTypes", formattedDeviceTypes);
+
+        String html = templateEngine.process("all_device_types_report_template", context);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ITextRenderer renderer = new ITextRenderer();
