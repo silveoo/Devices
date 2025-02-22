@@ -1,11 +1,14 @@
 package com.silveo.devices.controller;
 
+import com.silveo.devices.entity.DeviceType;
 import com.silveo.devices.entity.dto.DeviceInstanceReportDto;
 import com.silveo.devices.repository.DeviceInstanceRepository;
+import com.silveo.devices.repository.DeviceTypeRepository;
 import com.silveo.devices.service.DeviceInstanceService;
 import com.silveo.devices.service.PdfReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -24,6 +28,7 @@ public class ReportController {
     private final DeviceInstanceRepository repository;
     private final DeviceInstanceService deviceInstanceService;
     private final PdfReportService pdfReportService;
+    private final DeviceTypeRepository deviceTypeRepository;
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('report:generate')")
@@ -49,6 +54,21 @@ public class ReportController {
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=report.pdf")
+                .body(pdfBytes);
+    }
+
+    @GetMapping(value = "/device-type/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PreAuthorize("hasAnyAuthority('report:generate')")
+    public ResponseEntity<byte[]> generateDeviceTypePdfReport(
+            @RequestParam String deviceTypeName) throws IOException {
+
+        DeviceType deviceType = deviceTypeRepository.findByName(deviceTypeName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тип устройства не найден"));
+
+        byte[] pdfBytes = pdfReportService.generateDeviceTypePdfReport(deviceType);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=device-type-report.pdf")
                 .body(pdfBytes);
     }
 }

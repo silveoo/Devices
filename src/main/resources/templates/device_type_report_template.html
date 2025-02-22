@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Описание устройства</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+<h1>Описание устройства: <span th:text="${deviceType.name}"></span></h1>
+<div th:if="${deviceType.description}">
+    <p th:text="${deviceType.description}"></p>
+</div>
+
+<h2>Параметры устройства</h2>
+<table>
+    <tr>
+        <th>Параметр</th>
+        <th>Ожидаемое значение</th>
+    </tr>
+    <tr th:each="entry : ${formattedParameters}">
+        <td th:text="${entry.key}"></td>
+        <td th:text="${entry.value}"></td>
+    </tr>
+    <tr th:if="${#maps.isEmpty(formattedParameters)}">
+        <td colspan="2" style="text-align: center; color: #999;">
+            Нет параметров для отображения
+        </td>
+    </tr>
+</table>
+</body>
+</html>
