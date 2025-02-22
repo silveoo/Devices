@@ -35,4 +35,12 @@ public class DeviceTypeController {
     public ResponseEntity<DeviceType> getById(@PathVariable Long id) {
         return ResponseEntity.ok(repository.findById(id).orElse(null));
     }
+
+    @DeleteMapping
+    @PreAuthorize("hasAnyAuthority('devicetype:write')")
+    public ResponseEntity<Void> delete(@RequestParam Long id) {
+        log.info("Deleting device type {}", id);
+        repository.deleteByIdCascade(id);
+        return ResponseEntity.ok().build();
+    }
 }

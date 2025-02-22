@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TesterController {
-    private final TesterRepository repository;
     private final TesterService testerService;
 
     @PostMapping

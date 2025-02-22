@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeviceParameterTemplate {
-    private String name; // Например, "предельная температура"
+    private String name;
     @Enumerated(EnumType.STRING)
-    private ParameterType type; // Например, GREATER_THAN (>)
-    private String value; // Значение, например "270"
+    private ParameterType type;
+    private String value;
     private String minValue;
     private String maxValue;
     private String tolerancePercent;
