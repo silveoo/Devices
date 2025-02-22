@@ -3,22 +3,26 @@ package com.silveo.devices.service;
 import com.silveo.devices.entity.DeviceInstance;
 import com.silveo.devices.entity.DeviceType;
 import com.silveo.devices.entity.Tester;
+import com.silveo.devices.entity.User;
 import com.silveo.devices.entity.dto.DeviceInstanceReportDto;
-import com.silveo.devices.entity.dto.DeviceInstanceRequest;
+import com.silveo.devices.entity.dto.DeviceInstanceRequestDto;
 import com.silveo.devices.entity.embed.DeviceParameter;
 import com.silveo.devices.entity.embed.DeviceParameterTemplate;
-import com.silveo.devices.entity.enums.ParameterType;
 import com.silveo.devices.repository.DeviceInstanceRepository;
 import com.silveo.devices.repository.DeviceTypeRepository;
 import com.silveo.devices.repository.TesterRepository;
+import com.silveo.devices.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,17 +36,17 @@ public class DeviceInstanceService {
     private final DeviceValidationService deviceValidationService;
     private final DeviceTypeRepository typeRepository;
     private final TesterRepository testerRepository;
+    private final UserRepository userRepository;
 
-    public ResponseEntity<?> createInstance(DeviceInstanceRequest request) {
+    public ResponseEntity<?> createInstance(DeviceInstanceRequestDto request) throws AccessDeniedException {
         DeviceType type = typeRepository.findByName(request.getDeviceName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device type not found"));
-        Tester tester = testerRepository.findById(request.getTesterId())
-                .orElseThrow(() -> new RuntimeException("Тестировщик не найден"));
+        Tester currentTester = getCurrentTester();
 
         DeviceInstance instance = new DeviceInstance();
         instance.setDeviceType(type);
         instance.setParameters(request.getParameters());
-        instance.setTester(tester);
+        instance.setTester(currentTester);
         repository.save(instance);
 
         boolean isValid = deviceValidationService.validate(type, instance);
@@ -124,6 +128,22 @@ public class DeviceInstanceService {
         report.setDiscrepancies(discrepancies);
 
         return report;
+    }
+
+    private Tester getCurrentTester() throws AccessDeniedException {
+        // Получаем аутентификацию из SecurityContext
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        // Ищем доменную сущность User по имени
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+
+        if (user.getTester() == null) {
+            throw new AccessDeniedException("Current user is not a tester");
+        }
+        return user.getTester();
     }
 }
 

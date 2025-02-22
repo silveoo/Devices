@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DeviceInstanceRequest {
+public class DeviceInstanceRequestDto {
     private String requestId;
     private String deviceName;
     private Long testerId;
