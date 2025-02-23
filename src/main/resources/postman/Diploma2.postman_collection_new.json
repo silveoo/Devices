@@ -1,0 +1,827 @@
+{
+	"info": {
+		"_postman_id": "862dc1d9-428a-4afd-aaff-245869c99ba3",
+		"name": "Diploma2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33449540"
+	},
+	"item": [
+		{
+			"name": "Devices",
+			"item": [
+				{
+					"name": "AddDeviceType",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"КЭ-3 термометр\",\r\n  \"description\": null,\r\n  \"parameters\": [\r\n    {\"name\": \"предельная температура\", \"type\": \"GREATER_THAN\", \"value\": \"270\"},\r\n    {\"name\": \"минимальная температура\", \"type\": \"LESS_THAN\", \"value\": \"0\"},\r\n    {\"name\": \"работоспособность\", \"type\": \"EQUALS\", \"value\": \"1\"},\r\n    {\"name\": \"световой индикатор\", \"type\": \"EQUALS_STRING\", \"value\": \"красный\"},\r\n    {\"name\": \"числовое значение (1-100)\", \"type\": \"RANGE\", \"minValue\": \"1\", \"maxValue\": \"100\"},\r\n    {\"name\": \"номинальное напряжение\", \"type\": \"DEVIATION\", \"value\": \"1000\", \"tolerancePercent\": \"5\"}\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/device-types",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddDeviceInstance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requestId\": \"1231313\",\r\n  \"testerId\": \"5\",\r\n  \"deviceName\": \"КЭ-3 термометр\",\r\n  \"parameters\": [\r\n    {\"name\": \"предельная температура\", \"value\": \"271\"},\r\n    {\"name\": \"минимальная температура\", \"value\": \"-5\"},\r\n    {\"name\": \"работоспособность\", \"value\": \"1\"},\r\n    {\"name\": \"световой индикатор\", \"value\": \"красный\"},\r\n    {\"name\": \"числовое значение (1-100)\", \"value\": \"120\"},\r\n    {\"name\": \"номинальное напряжение\", \"value\": \"15000\"}\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/device-instances",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDeviceTypes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNDcwMCwiZXhwIjoxNzQwMjM5MTAwfQ.-ThiVz1ZWsDiJp7VZTeNO-3ipsdSk623FetwgBygLx8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/device-types",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDeviceInstances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZXIxIiwiaWF0IjoxNzQwMjI0MzQ0LCJleHAiOjE3NDAyMzg3NDR9.ZA8QyOs30J3br_T514p4_my09sjrRBtnbZRLOOTCFgA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/device-instances",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InstanceReport",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNDcwMCwiZXhwIjoxNzQwMjM5MTAwfQ.-ThiVz1ZWsDiJp7VZTeNO-3ipsdSk623FetwgBygLx8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report/pdf?instanceId=21&deviceName=КЭ-3 термометр",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report",
+								"pdf"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "21"
+								},
+								{
+									"key": "deviceName",
+									"value": "КЭ-3 термометр"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"silveoo\",\r\n    \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tester",
+			"item": [
+				{
+					"name": "GetTesters",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/testers",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"testers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddTester",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Иван Иванов\",\r\n    \"username\": \"silveoo\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/testers",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"testers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ShowcaseScenario",
+			"item": [
+				{
+					"name": "AddDeviceType",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"ДП-5000\",\r\n  \"description\": \"Интеллектуальный датчик для мониторинга давления в промышленных системах с функцией удаленного оповещения.\",\r\n  \"parameters\": [\r\n    {\"name\": \"максимальное давление\", \"type\": \"LESS_THAN\", \"value\": \"5000\"},\r\n    {\"name\": \"минимальное давление\", \"type\": \"GREATER_THAN\", \"value\": \"100\"},\r\n    {\"name\": \"точность измерения\", \"type\": \"RANGE\", \"minValue\": \"0.1\", \"maxValue\": \"1.0\"},\r\n    {\"name\": \"статус подключения\", \"type\": \"EQUALS_STRING\", \"value\": \"подключен\"},\r\n    {\"name\": \"температура окружающей среды\", \"type\": \"RANGE\", \"minValue\": \"-40\", \"maxValue\": \"85\"},\r\n    {\"name\": \"потребляемая мощность\", \"type\": \"DEVIATION\", \"value\": \"50\", \"tolerancePercent\": \"10\"}\r\n  ]\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/device-types",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddDeviceInstance Valid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requestId\": \"987654\",\r\n  \"testerId\": \"12\",\r\n  \"deviceName\": \"ДП-5000\",\r\n  \"parameters\": [\r\n    {\"name\": \"максимальное давление\", \"value\": \"4800\"},\r\n    {\"name\": \"минимальное давление\", \"value\": \"150\"},\r\n    {\"name\": \"точность измерения\", \"value\": \"0.5\"},\r\n    {\"name\": \"статус подключения\", \"value\": \"подключен\"},\r\n    {\"name\": \"температура окружающей среды\", \"value\": \"25\"},\r\n    {\"name\": \"потребляемая мощность\", \"value\": \"52\"}\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/device-instances",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddDeviceInstance inValid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNTkxNSwiZXhwIjoxNzQwMjQwMzE1fQ.Cek2MSTr2CBam3bhrL25mXSJ3EzIHKB7X4wBIReq4jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requestId\": \"1231313\",\r\n  \"testerId\": \"5\",\r\n  \"deviceName\": \"КЭ-3 термометр\",\r\n  \"parameters\": [\r\n    {\"name\": \"предельная температура\", \"value\": \"271\"},\r\n    {\"name\": \"минимальная температура\", \"value\": \"-5\"},\r\n    {\"name\": \"работоспособность\", \"value\": \"1\"},\r\n    {\"name\": \"световой индикатор\", \"value\": \"красный\"},\r\n    {\"name\": \"числовое значение (1-100)\", \"value\": \"120\"},\r\n    {\"name\": \"номинальное напряжение\", \"value\": \"15000\"}\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/device-instances",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ValidReportJSON",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report?instanceId=22&deviceName=ДП-5000",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "22"
+								},
+								{
+									"key": "deviceName",
+									"value": "ДП-5000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ValidReportJSON Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report?instanceId=22&deviceName=ДП-5000",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "22"
+								},
+								{
+									"key": "deviceName",
+									"value": "ДП-5000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InValidReportJSON",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report?instanceId=22&deviceName=ДП-5000",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "22"
+								},
+								{
+									"key": "deviceName",
+									"value": "ДП-5000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ValidReportJSON Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report?instanceId=22&deviceName=ДП-5000",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "22"
+								},
+								{
+									"key": "deviceName",
+									"value": "ДП-5000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"silveoo\",\r\n    \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTesters",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjI2NTE2LCJleHAiOjE3NDAyNDA5MTZ9.z_kjH1nB5_elPzjUASmpVmmcCA9ybeDJxitqzKz2Vco",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/testers",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"testers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDeviceTypes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIyNDcwMCwiZXhwIjoxNzQwMjM5MTAwfQ.-ThiVz1ZWsDiJp7VZTeNO-3ipsdSk623FetwgBygLx8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/device-types",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDeviceInstances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZXIxIiwiaWF0IjoxNzQwMjI0MzQ0LCJleHAiOjE3NDAyMzg3NDR9.ZA8QyOs30J3br_T514p4_my09sjrRBtnbZRLOOTCFgA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/device-instances",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteType",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDIzMDM0NiwiZXhwIjoxNzQwMjQ0NzQ2fQ.XYo1PsMoYtcVt1EEiqIQSHItS8rIfeNBxXjBuHu4MKM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/device-types/11",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"device-types",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeviceTypePDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaWx2ZW9vIiwiaWF0IjoxNzQwMjYzMzE5LCJleHAiOjE3NDAyNzc3MTl9.B_Mb628GH3enYRJiuXqczVMIard7LhLTRqlIJdCrDG8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report/device-type/pdf?deviceTypeName=К-32",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report",
+								"device-type",
+								"pdf"
+							],
+							"query": [
+								{
+									"key": "deviceTypeName",
+									"value": "К-32"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AllDeviceTypesPDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDI2NzkyMiwiZXhwIjoxNzQwMjgyMzIyfQ.q_UIdCKCDIJfW40UR6yd9_bqag80JHD0uZb1QD22Hd4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/report/all-device-types/pdf",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"report",
+								"all-device-types",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0MDMwNzgxNiwiZXhwIjoxNzQwMzIyMjE2fQ.4IrEElN6DIQqJva-N0exnZJ6WHKryIhgZ7dIneUz2R0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/v3/api-docs",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v3",
+								"api-docs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
