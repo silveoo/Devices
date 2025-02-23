@@ -6,6 +6,8 @@ import com.silveo.devices.repository.DeviceInstanceRepository;
 import com.silveo.devices.repository.DeviceTypeRepository;
 import com.silveo.devices.service.DeviceInstanceService;
 import com.silveo.devices.service.PdfReportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequestMapping("api/v1/report")
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Report", description = "Генерация отчетов в форматах JSON и PDF")
 public class ReportController {
     private final DeviceInstanceRepository repository;
     private final DeviceInstanceService deviceInstanceService;
@@ -33,6 +36,8 @@ public class ReportController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('report:generate')")
+    @Operation(summary = "Генерация отчета JSON (соответствие)",
+            description = "JSON отчет, содержащий ожидаемые параметры, фактические параметры и таблицу несоответствий")
     public ResponseEntity<DeviceInstanceReportDto> generateReport(
             @RequestParam Long instanceId,
             @RequestParam String deviceName) {
@@ -44,6 +49,8 @@ public class ReportController {
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyAuthority('report:generate')")
+    @Operation(summary = "Генерация отчета PDF (соответствие)",
+            description = "PDF отчет, содержащий ожидаемые параметры, фактические параметры и таблицу несоответствий")
     public ResponseEntity<byte[]> generatePdfReport(
             @RequestParam Long instanceId,
             @RequestParam String deviceName) throws IOException {
@@ -60,6 +67,7 @@ public class ReportController {
 
     @GetMapping(value = "/device-type/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyAuthority('report:generate')")
+    @Operation(summary = "Генерация PDF отчета типа устройства", description = "PDF отчет конкретного типа устройства")
     public ResponseEntity<byte[]> generateDeviceTypePdfReport(
             @RequestParam String deviceTypeName) throws IOException {
 
@@ -75,6 +83,7 @@ public class ReportController {
 
     @GetMapping(value = "/all-device-types/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyAuthority('report:generate')")
+    @Operation(summary = "Генерация PDF отчета всех типов устройств")
     public ResponseEntity<byte[]> generateAllDeviceTypesReport() throws IOException {
         List<DeviceType> allDeviceTypes = deviceTypeRepository  .findAll(); // Предполагаем наличие метода findAll()
 

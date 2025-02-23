@@ -4,6 +4,8 @@ import com.silveo.devices.entity.dto.AuthRequest;
 import com.silveo.devices.entity.dto.AuthResponse;
 import com.silveo.devices.service.CustomUserDetailsService;
 import com.silveo.devices.service.util.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "Аутентификация")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,6 +30,7 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
+    @Operation(summary = "Авторизация", description = "Вход пользователя под своей учетной записью")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             Authentication auth = authenticationManager.authenticate(
