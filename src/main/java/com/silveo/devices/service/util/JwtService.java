@@ -11,7 +11,7 @@ import java.util.Date;
 @Service
 @Slf4j
 public class JwtService {
-    private static final String SECRET_KEY = "maxvolkovsuperguy22baby23ijfjsjnsfjsnfjsnfjsnfsfwadada";
+    private static final String SECRET_KEY = "maxvolkovsuuperguy22baby23ijfjsjnsfjsnfjsnfjsnfsfwadada";
 
     public String generateToken(UserDetails userDetails) {
         log.info("Generating token for user: " + userDetails.getUsername());

@@ -57,6 +57,28 @@
   color: #555;
 }
 
+.recharts-x-axis .recharts-label {
+  font-weight: 500;
+  fill: #333;
+}
+
+/* Кастомизация осей */
+.recharts-y-axis .recharts-text {
+  font-size: 12px !important;
+  transform: translate(-10px, 5px);
+}
+
+/* Цвета столбцов */
+.recharts-bar .recharts-bar-rectangle {
+  fill-opacity: 0.9;
+  color: #27ae60;
+}
+
+.recharts-tooltip-item-value {
+  font-weight: bold !important;
+  color: #333 !important;
+}
+
 .table td {
   vertical-align: top;
 }
