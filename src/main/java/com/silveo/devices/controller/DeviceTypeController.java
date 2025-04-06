@@ -32,7 +32,12 @@ public class DeviceTypeController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('device:read')")
     @Operation(summary = "Получение всех типов устройств")
-    public ResponseEntity<List<DeviceType>> getAll() {
+    public ResponseEntity<List<DeviceType>> getAll(
+            @RequestParam(required = false) String search
+    ) {
+        if (search != null && !search.isBlank()) {
+            return ResponseEntity.ok(repository.search(search));
+        }
         return ResponseEntity.ok(repository.findAll());
     }
 
@@ -43,10 +48,10 @@ public class DeviceTypeController {
         return ResponseEntity.ok(repository.findById(id).orElse(null));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}") // Используем PathVariable вместо RequestParam
     @PreAuthorize("hasAnyAuthority('devicetype:write')")
-    @Operation(summary = "Удаление типа устройства", description = "Каскадное удаление типа устройства и всех его экземпляров")
-    public ResponseEntity<Void> delete(@RequestParam Long id) {
+    @Operation(summary = "Удаление типа устройства")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Deleting device type {}", id);
         repository.deleteByIdCascade(id);
         return ResponseEntity.ok().build();

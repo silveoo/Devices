@@ -46,4 +46,16 @@ public class DeviceInstanceController {
         return ResponseEntity.ok(repository.findAll());
     }
 
+    @GetMapping("/by-type/")
+    @PreAuthorize("hasAnyAuthority('device:read')")
+    @Operation(summary = "Получение экземпляров устройств")
+    public ResponseEntity<List<DeviceInstance>> getAllByType(
+            @RequestParam(required = false) Long deviceTypeId // Параметр для фильтрации
+    ) {
+        if (deviceTypeId != null) {
+            return ResponseEntity.ok(repository.findByDeviceTypeId(deviceTypeId));
+        }
+        return ResponseEntity.ok(repository.findAll());
+    }
+
 }

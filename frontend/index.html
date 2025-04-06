@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="styles/custom.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-cpu"></i> Устройства
+        </a>
+        <div class="d-flex align-items-center">
+            <span id="currentUser" class="text-light me-3"></span>
+            <button class="btn btn-danger" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Выйти
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Кнопка "Создать тип" -->
+    <div class="d-flex justify-content-between mb-4">
+        <button id="createTypeBtn" class="btn btn-success" style="display: none;">
+            <i class="bi bi-plus-circle"></i> Новый тип
+        </button>
+        <input
+                type="text"
+                id="searchInput"
+                class="form-control w-50"
+                placeholder="Поиск по названию, описанию или параметрам..."
+        >
+    </div>
+
+    <!-- Сетка типов устройств -->
+    <div id="deviceTypesGrid" class="row row-cols-1 row-cols-md-3 g-4"></div>
+</div>
+
+<!-- Модальное окно создания типа -->
+<!-- Модальное окно создания типа -->
+<div class="modal fade" id="createTypeModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-device-ssd"></i> Новый тип устройства</h5>
+            </div>
+            <div class="modal-body">
+                <form id="createTypeForm">
+                    <div class="mb-3">
+                        <label class="form-label">Название типа</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" name="description"></textarea>
+                    </div>
+
+                    <!-- Параметры типа -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6>Параметры</h6>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addParameterField()">
+                                <i class="bi bi-plus"></i> Добавить параметр
+                            </button>
+                        </div>
+                        <div id="parametersContainer"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check2"></i> Создать
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Динамическое модальное окно -->
+<div class="modal fade" id="dynamicModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-files"></i> Экземпляры</h5>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания экземпляра -->
+<div class="modal fade" id="createInstanceModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-clipboard-plus"></i> Новый экземпляр</h5>
+            </div>
+            <div class="modal-body">
+                <form id="createInstanceForm">
+                    <div id="instanceParametersContainer"></div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check2"></i> Создать
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Контейнер для уведомлений (вверху справа) -->
+<div id="notificationContainer"
+     class="toast-container position-fixed top-0 end-0 p-3"
+     style="z-index: 9999">
+</div>
+
+<script src="scripts/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

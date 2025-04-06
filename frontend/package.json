@@ -1,0 +1,25 @@
+{
+  "name": "devices",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server --port=3000 --open=auth.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silveoo/Devices.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/silveoo/Devices/issues"
+  },
+  "homepage": "https://github.com/silveoo/Devices#readme",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "^5.3.5",
+    "bootstrap-icons": "^1.11.3",
+    "live-server": "^1.2.2"
+  }
+}

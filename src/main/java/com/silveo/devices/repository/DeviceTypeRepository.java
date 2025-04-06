@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,4 +28,12 @@ public interface DeviceTypeRepository extends JpaRepository<DeviceType, Long> {
     @Modifying
     @Query("DELETE FROM DeviceInstance di WHERE di.deviceType.id = :deviceTypeId")
     void deleteRelatedDeviceInstances(@Param("deviceTypeId") Long deviceTypeId);
+
+    @Query("SELECT dt FROM DeviceType dt WHERE " +
+            "LOWER(dt.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(dt.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "EXISTS (SELECT p FROM dt.parameters p WHERE " +
+            "LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(p.value) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    List<DeviceType> search(@Param("searchTerm") String searchTerm);
 }

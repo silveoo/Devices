@@ -1,0 +1,86 @@
+/* Анимации */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Кастомные цвета */
+.btn-success {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.badge {
+    background-color: #3498db;
+}
+
+.parameter-card {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.parameter-card .form-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Анимация появления/скрытия */
+.toast {
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateX(100%);
+}
+.toast.show {
+    transform: translateX(0);
+}
+/* Анимация аккордеона */
+.collapse {
+    transition: all 0.3s ease;
+}
+
+/* Иконка шеврона */
+.bi-chevron-down, .bi-chevron-up {
+    transition: transform 0.3s;
+}
+
+/* Подсветка строк */
+.table-danger td {
+    background-color: #ffe6e6 !important;
+}
+
+.table-success td {
+    background-color: #e6ffe6 !important;
+}
+
+.badge.bg-primary {
+    position: relative;
+    z-index: 2; /* Перекрывает кнопку удаления */
+}
+
+.card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80%; /* Ограничивает ширину заголовка */
+}
+
+/* Фиксированный navbar */
+.navbar.fixed-top {
+    z-index: 1030; /* Стандартный z-index для фиксированных элементов Bootstrap */
+}
+
+/* Отступ для основного контента */
+body {
+    padding-top: 70px; /* Подстройте под высоту вашего navbar */
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 992px) {
+    body {
+        padding-top: 60px; /* Меньший отступ для мобильной версии */
+    }
+}
