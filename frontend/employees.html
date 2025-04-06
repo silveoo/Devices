@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сотрудники</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="styles/custom.css" rel="stylesheet">
+    <!-- Общие стили -->
+    <!-- Общие стили -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles/custom.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-4">
+        <h3>Управление сотрудниками</h3>
+        <button class="btn btn-success" onclick="showAddEmployeeModal()">
+            <i class="bi bi-plus-lg"></i> Добавить
+        </button>
+    </div>
+    <div id="employeesGrid" class="row row-cols-1 row-cols-md-3 g-4"></div>
+</div>
+
+<!-- Модальное окно добавления -->
+<div class="modal fade" id="addEmployeeModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новый сотрудник</h5>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="mb-3">
+                        <label>Имя</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Логин</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Пароль</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="scripts/employees.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Общий скрипт -->
+<script src="scripts/common.js"></script>
+<!-- Остальные скрипты -->
+<script src="scripts/main.js"></script> <!-- Например -->
+</body>
+</html>

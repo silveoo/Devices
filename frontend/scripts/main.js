@@ -211,9 +211,12 @@ document.getElementById('createTypeForm').addEventListener('submit', async (e) =
         });
 
         if (response.ok) {
+            showNotification('Тип устройства создан!', 'success');
             loadDeviceTypes();
-            showNotification('Устройство успешно создано!', 'success');
-            new bootstrap.Modal('#createTypeModal').hide();
+
+            // Исправляем закрытие
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createTypeModal'));
+            modal.hide();
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -262,9 +265,10 @@ document.getElementById('createInstanceForm').addEventListener('submit', async (
         });
 
         if (response.ok) {
-            showNotification('Экземпляр успешно создан!', 'success');
-            new bootstrap.Modal('#createInstanceModal').hide();
-            loadDeviceTypes(); // Обновляем список
+            showNotification('Экземпляр создан!', 'success');
+            loadDeviceTypes();
+
+            // Исправляем закрытие
             const modal = bootstrap.Modal.getInstance(document.getElementById('createInstanceModal'));
             modal.hide();
         }
@@ -306,17 +310,27 @@ function logout() {
 async function checkUserRole() {
     try {
         const response = await fetch('http://localhost:8080/auth/users/me', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const user = await response.json();
         isAdmin = user.roles?.some(role => role.name === 'ADMIN');
 
+        // Показываем элементы для админа
         if (isAdmin) {
+            document.getElementById('employeesNavLink').style.display = 'block';
             document.getElementById('createTypeBtn').style.display = 'block';
         }
-        loadDeviceTypes(); // Перерендерим карточки после проверки роли
+
+        // Подсветка активной страницы
+        const currentPage = window.location.pathname.split('/').pop();
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        loadDeviceTypes();
     } catch (error) {
         console.error('Ошибка проверки роли:', error);
     }
