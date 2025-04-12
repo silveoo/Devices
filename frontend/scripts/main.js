@@ -41,8 +41,6 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 });
 
 
-// Загрузка типов устройств
-// Исправленная функция loadDeviceTypes
 async function loadDeviceTypes(searchQuery = '') {
     let types = []; // Инициализируем переменную
 
@@ -78,9 +76,13 @@ async function loadDeviceTypes(searchQuery = '') {
     const grid = document.getElementById('deviceTypesGrid');
 
     if (isSplitView) {
-        renderDeviceTypes([types[0]], isAdmin, true); // Для примера, берем первый элемент
+        // Для split view
+        grid.style.display = 'none';
+        renderDeviceTypes([types[0]], isAdmin, true);
     } else {
-        grid.classList.add('row-cols-1', 'row-cols-md-3', 'g-4');
+        // Для обычного режима
+        grid.style.display = 'flex'; // Добавляем flex
+        grid.className = 'row row-cols-1 row-cols-md-3 g-4'; // Явно задаем классы
         renderDeviceTypes(types, isAdmin);
     }
 }
@@ -463,15 +465,23 @@ function checkParameterCompliance(expected, actual) {
     }
 }
 
-// Обновленная функция exitSplitView
-function exitSplitView() {
+async function exitSplitView() {
     const grid = document.getElementById('deviceTypesGrid');
-    grid.style.display = 'grid'; // Восстанавливаем grid-отображение
-    grid.classList.remove('row-cols-1'); // Удаляем ограничение на 1 колонку
-    grid.classList.add('row-cols-1', 'row-cols-md-3', 'g-4'); // Восстанавливаем исходные классы
+    const splitContainer = document.getElementById('splitViewContainer');
 
-    document.getElementById('splitViewContainer').style.display = 'none';
-    loadDeviceTypes(); // Перезагружаем данные
+    // Полностью восстанавливаем оригинальную структуру
+    grid.style.display = 'flex'; // Важно: Bootstrap использует flex для row
+    grid.classList.add('row', 'row-cols-1', 'row-cols-md-3', 'g-4');
+
+    // Очищаем возможные остаточные стили
+    grid.style.grid = '';
+    grid.style.flex = '';
+
+    // Скрываем split view
+    splitContainer.style.display = 'none';
+
+    // Принудительно перезагружаем сетку
+    await loadDeviceTypes();
 }
 
 function renderInstanceCard(instance) {
@@ -480,7 +490,7 @@ function renderInstanceCard(instance) {
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <span class="fw-bold">Экземпляр #${instance.id}</span>
-                    <small class="text-muted">Создан: ${new Date().toLocaleDateString()}</small>
+                    <small class="text-muted">Тест проведен: ${new Date().toLocaleDateString()}</small>
                 </div>
                 <div>
                     <button class="btn btn-sm btn-outline-primary instance-details-toggle" 
@@ -517,42 +527,6 @@ function renderInstancesColumn(instances) {
     container.querySelectorAll('.instance-details-toggle').forEach(btn => {
         btn.addEventListener('click', () => toggleDetails(btn.dataset.instanceId));
     });
-}
-
-function renderInstances(typeId, instances) {
-    const modalContent = instances.map(instance => `
-        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-            <div>
-                <span class="fw-bold">Экземпляр #${instance.id}</span>
-                <span class="text-muted small">Создан: ${new Date().toLocaleDateString()}</span>
-            </div>
-            <div>
-                <button class="btn btn-sm btn-warning" 
-                        onclick="generateReport(${instance.id}, '${instance.deviceType.name}')">
-                    <i class="bi bi-file-earmark-pdf"></i> Отчет
-                </button>
-            </div>
-        </div>
-    `).join('');
-
-    // Создаем модальное окно динамически
-    const modal = new bootstrap.Modal(document.createElement('div'));
-    modal._element.className = 'modal fade';
-    modal._element.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-collection"></i> Экземпляры</h5>
-                </div>
-                <div class="modal-body">
-                    ${modalContent}
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal._element);
-    modal.show();
 }
 
 async function generateReport(instanceId, deviceName) {
@@ -593,74 +567,6 @@ async function generateReport(instanceId, deviceName) {
         console.error('Ошибка:', error);
         showNotification(`Не удалось скачать отчет: ${error.message}`, 'danger');
     }
-}
-
-function renderInstancesModal(instances) {
-    const modalContent = instances.map(instance => `
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">
-                    <i class="bi bi-hdd me-2"></i> Экземпляр #${instance.id}
-                </h6>
-                <button class="btn btn-link" 
-                        onclick="toggleDetails(${instance.id})"
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#details-${instance.id}">
-                    <i class="bi bi-chevron-down"></i>
-                </button>
-            </div>
-            
-            <div id="details-${instance.id}" class="collapse">
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Блок с общей информацией -->
-                        <div class="col-md-6 mb-3">
-                            <div class="alert alert-info">
-                                <i class="bi bi-person"></i> Тестировщик: ${instance.tester?.name || "Нет данных"}
-                            </div>
-                        </div>
-                        
-                        <!-- Блок с кнопкой отчета -->
-                        <div class="col-md-6 mb-3">
-                            <button class="btn btn-warning w-100" 
-                                    onclick="generateReport(${instance.id}, '${instance.deviceType.name}')">
-                                <i class="bi bi-file-pdf"></i> Скачать PDF
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Таблица параметров -->
-                    <h6 class="mb-3"><i class="bi bi-clipboard-data"></i> Параметры</h6>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Параметр</th>
-                                    <th>Ожидаемое</th>
-                                    <th>Фактическое</th>
-                                    <th>Соответствие</th>
-                                </tr>
-                            </thead>
-                            <tbody id="params-${instance.id}">
-                                <!-- Данные загружаются динамически -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `).join('');
-
-    const modal = new bootstrap.Modal(document.getElementById('dynamicModal'));
-    document.getElementById('modalBody').innerHTML = modalContent;
-    const modalDialog = document.querySelector('#dynamicModal .modal-dialog');
-    modalDialog.classList.add('modal-xl');
-    modal.show();
-
-    // Динамическая загрузка параметров для каждого экземпляра
-    instances.forEach(instance => {
-        loadParametersForInstance(instance.id, instance.deviceType.name);
-    });
 }
 
 async function loadParametersForInstance(instanceId, deviceName) {

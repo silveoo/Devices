@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,14 @@ public class DeviceInstance {
     @JoinColumn(name = "device_type_id", nullable = false)
     private DeviceType deviceType;
 
+    private LocalDateTime testedAt;
+
     @ElementCollection
     @CollectionTable(name = "device_instance_parameters", joinColumns = @JoinColumn(name = "device_instance_id"))
     private List<DeviceParameter> parameters = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        this.testedAt = LocalDateTime.now();
+    }
 }
