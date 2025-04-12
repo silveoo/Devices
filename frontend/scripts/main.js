@@ -42,11 +42,13 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 
 
 // Загрузка типов устройств
+// Исправленная функция loadDeviceTypes
 async function loadDeviceTypes(searchQuery = '') {
+    let types = []; // Инициализируем переменную
+
     try {
         const url = new URL('http://localhost:8080/api/v1/device-types');
 
-        // Добавляем параметр поиска, если он указан
         if (searchQuery.trim()) {
             url.searchParams.append('search', searchQuery);
         }
@@ -61,18 +63,34 @@ async function loadDeviceTypes(searchQuery = '') {
             throw new Error(`Ошибка HTTP: ${response.status}`);
         }
 
-        const types = await response.json();
-        renderDeviceTypes(types);
+        types = await response.json(); // Присваиваем значение
+
     } catch (error) {
         console.error('Ошибка:', error);
+        const errorMessage = `Не удалось загрузить данные: ${error.message}`;
         document.getElementById('deviceTypesGrid').innerHTML =
-            `<div class="text-danger">Не удалось загрузить данные: ${error.message}</div>`;
+            `<div class="text-danger">${errorMessage}</div>`;
+        return; // Прерываем выполнение при ошибке
+    }
+
+    // После успешной загрузки
+    const isSplitView = document.getElementById('splitViewContainer').style.display === 'block';
+    const grid = document.getElementById('deviceTypesGrid');
+
+    if (isSplitView) {
+        renderDeviceTypes([types[0]], isAdmin, true); // Для примера, берем первый элемент
+    } else {
+        grid.classList.add('row-cols-1', 'row-cols-md-3', 'g-4');
+        renderDeviceTypes(types, isAdmin);
     }
 }
 
 // Отображение типов
-function renderDeviceTypes(types) {
-    const grid = document.getElementById('deviceTypesGrid');
+function renderDeviceTypes(types, isAdmin, isSplitView = false) {
+    const grid = isSplitView
+        ? document.getElementById('deviceTypesColumn')
+        : document.getElementById('deviceTypesGrid');
+
     if (!types || types.length === 0) {
         grid.innerHTML = '<div class="text-muted">Нет типов устройств</div>';
         return;
@@ -81,7 +99,6 @@ function renderDeviceTypes(types) {
     grid.innerHTML = types.map(type => `
         <div class="col">
             <div class="card h-100 shadow-sm position-relative">
-                <!-- Кнопка удаления (справа вверху) -->
                 ${isAdmin ? `
                 <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
                         onclick="deleteDeviceType(${type.id})"
@@ -92,18 +109,15 @@ function renderDeviceTypes(types) {
                 ` : ''}
 
                 <div class="card-body">
-                    <!-- Заголовок и количество параметров (слева вверху) -->
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <h5 class="card-title flex-grow-1 me-2">
                             <i class="bi bi-motherboard"></i> ${type.name}
                         </h5>
-                        <span class="badge bg-primary" style="z-index: 1">${type.parameters?.length || 0}</span>
+                        <span class="badge bg-primary">${type.parameters?.length || 0}</span>
                     </div>
 
-                    <!-- Описание -->
                     <p class="card-text text-muted small">${type.description || 'Нет описания'}</p>
 
-                    <!-- Кнопки управления -->
                     <div class="mt-3 d-grid gap-2">
                         <button class="btn btn-outline-primary" 
                                 onclick="createInstance('${type.id}')">
@@ -335,21 +349,174 @@ async function checkUserRole() {
         console.error('Ошибка проверки роли:', error);
     }
 }
-
 async function showInstances(typeId) {
     try {
-        // Запрос с параметром deviceTypeId
         const response = await fetch(`http://localhost:8080/api/v1/device-instances/by-type/?deviceTypeId=${typeId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
         if (response.ok) {
             const instances = await response.json();
-            renderInstancesModal(instances);
+
+            // Активируем разделенный вид
+            document.getElementById('deviceTypesGrid').style.display = 'none';
+            document.getElementById('splitViewContainer').style.display = 'block';
+
+            // Загружаем информацию о типе устройства
+            const typeResponse = await fetch(`http://localhost:8080/api/v1/device-types/${typeId}`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const deviceType = await typeResponse.json();
+
+            // Рендерим карточку типа в левой колонке
+            renderDeviceTypes([deviceType], isAdmin, true);
+
+            // Рендерим экземпляры в правой колонке
+            renderInstancesColumn(instances);
         }
     } catch (error) {
         console.error('Ошибка:', error);
     }
+}
+
+function renderInstanceDetails(instance) {
+    return `
+        <div class="mt-3">
+            <div class="alert alert-info">
+                <i class="bi bi-person"></i> Тестировщик: ${instance.tester?.name || "Нет данных"}
+            </div>
+            <button class="btn btn-warning w-100 mb-3" 
+                    onclick="generateReport(${instance.id}, '${instance.deviceType.name}')">
+                <i class="bi bi-file-pdf"></i> Скачать PDF
+            </button>
+            <h6><i class="bi bi-clipboard-data"></i> Параметры</h6>
+            <div class="table-responsive">
+                ${renderParametersTable(instance)}
+            </div>
+        </div>
+    `;
+}
+
+function renderParametersTable(instance) {
+    const expectedParams = instance.deviceType.parameters || [];
+    const actualParams = instance.parameters || [];
+
+    return `
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Параметр</th>
+                    <th>Ожидаемое</th>
+                    <th>Фактическое</th>
+                    <th>Соответствие</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${expectedParams.map(param => {
+        const actual = actualParams.find(p => p.name === param.name);
+        const isMatch = checkParameterCompliance(param, actual);
+        return `
+                        <tr class="${isMatch ? 'table-success' : 'table-danger'}">
+                            <td>${param.name}</td>
+                            <td>${formatParameterValue(param)}</td>
+                            <td>${actual?.value || 'N/A'}</td>
+                            <td>
+                                ${isMatch ?
+            '<i class="bi bi-check-circle text-success"></i>' :
+            '<i class="bi bi-x-circle text-danger"></i>'}
+                            </td>
+                        </tr>
+                    `;
+    }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function formatParameterValue(param) {
+    switch (param.type) {
+        case 'RANGE':
+            return `${param.minValue} - ${param.maxValue}`;
+        case 'DEVIATION':
+            return `${param.value} ±${param.tolerancePercent}%`;
+        default:
+            return param.value || 'N/A';
+    }
+}
+
+function checkParameterCompliance(expected, actual) {
+    if (!actual) return false;
+
+    switch (expected.type) {
+        case 'RANGE':
+            return actual.value >= expected.minValue && actual.value <= expected.maxValue;
+        case 'DEVIATION':
+            const deviation = Math.abs(actual.value - expected.value);
+            const allowedDeviation = expected.value * (expected.tolerancePercent / 100);
+            return deviation <= allowedDeviation;
+        case 'EQUALS_STRING':
+            return actual.value === expected.value;
+        case 'EQUALS':
+            return parseFloat(actual.value) === parseFloat(expected.value);
+        default:
+            return true;
+    }
+}
+
+// Обновленная функция exitSplitView
+function exitSplitView() {
+    const grid = document.getElementById('deviceTypesGrid');
+    grid.style.display = 'grid'; // Восстанавливаем grid-отображение
+    grid.classList.remove('row-cols-1'); // Удаляем ограничение на 1 колонку
+    grid.classList.add('row-cols-1', 'row-cols-md-3', 'g-4'); // Восстанавливаем исходные классы
+
+    document.getElementById('splitViewContainer').style.display = 'none';
+    loadDeviceTypes(); // Перезагружаем данные
+}
+
+function renderInstanceCard(instance) {
+    return `
+        <div class="instance-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-bold">Экземпляр #${instance.id}</span>
+                    <small class="text-muted">Создан: ${new Date().toLocaleDateString()}</small>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary instance-details-toggle" 
+                            data-instance-id="${instance.id}">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="instance-details" id="details-${instance.id}" style="display: none;">
+                ${renderInstanceDetails(instance)}
+            </div>
+        </div>
+    `;
+}
+
+function renderInstancesColumn(instances) {
+    const container = document.getElementById('instancesColumn');
+    container.innerHTML = `
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-list-ul"></i> Экземпляры устройства
+                </h5>
+                ${instances.map(instance => `
+                    <div class="card mb-3">
+                        ${renderInstanceCard(instance)}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Добавляем обработчики для раскрытия деталей
+    container.querySelectorAll('.instance-details-toggle').forEach(btn => {
+        btn.addEventListener('click', () => toggleDetails(btn.dataset.instanceId));
+    });
 }
 
 function renderInstances(typeId, instances) {
@@ -555,7 +722,10 @@ async function loadParametersForInstance(instanceId, deviceName) {
 }
 
 function toggleDetails(instanceId) {
-    const icon = document.querySelector(`[data-bs-target="#details-${instanceId}"] i`);
+    const details = document.getElementById(`details-${instanceId}`);
+    const icon = document.querySelector(`[data-instance-id="${instanceId}"] i`);
+
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
     icon.classList.toggle('bi-chevron-down');
     icon.classList.toggle('bi-chevron-up');
 }
