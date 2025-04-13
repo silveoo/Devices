@@ -98,11 +98,9 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
         return;
     }
 
-    console.log(isAdmin + "1313131231");
-
     grid.innerHTML = types.map(type => `
         <div class="col">
-            <div class="card h-100 shadow-sm position-relative"  data-type-id="${type.id}">
+            <div class="card h-100 shadow-sm position-relative" data-type-id="${type.id}">
                 ${isAdmin ? `
                 <button class="btn btn-danger btn-sm admin-trash-btn" 
                         onclick="deleteDeviceType('${type.id}')"
@@ -110,7 +108,6 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                     <i class="bi bi-trash"></i>
                 </button>
                 ` : ''}
-
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <h5 class="card-title flex-grow-1 me-2">
@@ -118,9 +115,25 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                         </h5>
                         <span class="badge bg-primary">${type.parameters?.length || 0}</span>
                     </div>
-
                     <p class="card-text text-muted small">${type.description || 'Нет описания'}</p>
-
+                    
+                    <!-- Блок параметров теперь отображается только в split view -->
+                    ${isSplitView ? `
+                    <div class="mt-3">
+                        <h6 class="mb-2"><i class="bi bi-list-check"></i> Параметры:</h6>
+                        <ul class="list-group list-group-flush">
+                            ${type.parameters.map(param => `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>${param.name}</span>
+                                    <span class="badge bg-secondary text-white">
+                                        ${formatParameterDescription(param)}
+                                    </span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
                     <div class="mt-3 d-grid gap-2">
                         <button class="btn btn-outline-primary" 
                                 onclick="createInstance('${type.id}')">
@@ -135,6 +148,35 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
             </div>
         </div>
     `).join('');
+}
+
+function formatParameterDescription(param) {
+    switch (param.type) {
+        case 'LESS_THAN':
+            return `< ${param.value}`;
+        case 'GREATER_THAN':
+            return `> ${param.value}`;
+        case 'EQUALS_STRING':
+            return `= "${param.value}"`;
+        case 'EQUALS':
+            return `= ${param.value}`;
+        case 'RANGE':
+            return `${param.minValue} - ${param.maxValue}`;
+        case 'DEVIATION':
+            return `${param.value} ±${param.tolerancePercent}%`;
+        case 'ENUM':
+            // Исправление: проверяем тип и преобразуем строку в массив
+            const values = param.allowedValues
+                ? (typeof param.allowedValues === 'string'
+                    ? param.allowedValues.split(',').map(v => v.trim())
+                    : param.allowedValues)
+                : [];
+            return values.join(', ') || 'N/A';
+        case 'BOOLEAN':
+            return param.value ? 'Да' : 'Нет';
+        default:
+            return param.value || 'N/A';
+    }
 }
 
 let currentDeviceTypeName = ""; // Глобальная переменная для хранения имени типа
