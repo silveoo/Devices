@@ -506,6 +506,10 @@ function renderParametersTable(instance) {
 
 function formatParameterValue(param) {
     switch (param.type) {
+        case 'LESS_THAN':
+            return `< ${param.value}`;
+        case 'GREATER_THAN':
+            return `> ${param.value}`;
         case 'RANGE':
             return `${param.minValue} - ${param.maxValue}`;
         case 'DEVIATION':
@@ -528,14 +532,24 @@ function formatParameterValue(param) {
 
 function checkParameterCompliance(expected, actual) {
     if (!actual) return false;
-
     switch (expected.type) {
+        case 'LESS_THAN':
+            // Преобразуем в числа
+            const actualLess = parseFloat(actual.value);
+            const expectedLess = parseFloat(expected.value);
+            return !isNaN(actualLess) && !isNaN(expectedLess) && actualLess < expectedLess;
+        case 'GREATER_THAN':
+            const actualGreater = parseFloat(actual.value);
+            const expectedGreater = parseFloat(expected.value);
+            return !isNaN(actualGreater) && !isNaN(expectedGreater) && actualGreater > expectedGreater;
         case 'RANGE':
-            const numericValue = parseFloat(actual.value); // Преобразуем в число
-            return numericValue >= expected.minValue && numericValue <= expected.maxValue;
+            const numericValue = parseFloat(actual.value);
+            return !isNaN(numericValue) &&
+                numericValue >= expected.minValue &&
+                numericValue <= expected.maxValue;
         case 'DEVIATION':
-            const deviation = Math.abs(actual.value - expected.value);
-            const allowedDeviation = expected.value * (expected.tolerancePercent / 100);
+            const deviation = Math.abs(parseFloat(actual.value) - parseFloat(expected.value));
+            const allowedDeviation = parseFloat(expected.value) * (expected.tolerancePercent / 100);
             return deviation <= allowedDeviation;
         case 'EQUALS_STRING':
             return actual.value === expected.value;
