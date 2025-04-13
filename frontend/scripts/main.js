@@ -210,25 +210,76 @@ function getParameterInputField(param) {
     switch (param.type) {
         case 'BOOLEAN':
             return `
-                <select class="form-select" name="parameters[${param.name}]" required>
-                    <option value="true">Да</option>
-                    <option value="false">Нет</option>
-                </select>
-            `;
-        case 'RANGE':
-            // Добавляем атрибуты min, max и step
-            return `
-                <input 
-                    type="number" 
-                    class="form-control" 
-                    name="parameters[${param.name}]" 
-                    step="any" <!-- Разрешаем дробные числа -->
-            `;
+        <div class="btn-group w-100" role="group">
+            <input 
+                type="hidden" 
+                name="parameters[${param.name}]" 
+                value="${param.value || 'false'}"
+            >
+            <button 
+                type="button" 
+                class="btn ${param.value === 'true' ? 'btn-primary active' : 'btn-outline-primary'} w-50" 
+                onclick="
+                    const group = this.closest('.btn-group');
+                    group.querySelector('input').value = 'true';
+                    group.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                "
+            >
+                Да
+            </button>
+            <button 
+                type="button" 
+                class="btn ${param.value === 'false' ? 'btn-secondary active' : 'btn-outline-secondary'} w-50" 
+                onclick="
+                    const group = this.closest('.btn-group');
+                    group.querySelector('input').value = 'false';
+                    group.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                "
+            >
+                Нет
+            </button>
+        </div>
+    `;
         default:
-            return `<input type="text" class="form-control" name="parameters[${param.name}]" required>`;
+            const expectedValue = formatParameterValue(param);
+            return `
+                <div class="input-group mb-3">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        name="parameters[${param.name}]"
+                        placeholder="Фактическое значение"
+                    >
+                    <span class="input-group-text text-muted">
+                        Ожидается: ${expectedValue}
+                    </span>
+                </div>
+            `;
     }
 }
 
+function formatParameterValue(param) {
+    switch (param.type) {
+        case 'LESS_THAN':
+            return `< ${param.value}`;
+        case 'GREATER_THAN':
+            return `> ${param.value}`;
+        case 'EQUALS_STRING':
+            return `= "${param.value}"`;
+        case 'RANGE':
+            return `${param.minValue} - ${param.maxValue}`;
+        case 'DEVIATION':
+            return `${param.value} ±${param.tolerancePercent}%`;
+        case 'ENUM':
+            return param.allowedValues.join(', ');
+        case 'BOOLEAN':
+            return param.value === 'true' ? 'Да' : 'Нет';
+        default:
+            return param.value || 'N/A';
+    }
+}
 
 // Логика создания типа
 document.getElementById('createTypeBtn').addEventListener('click', () => {
@@ -555,6 +606,9 @@ function checkParameterCompliance(expected, actual) {
             return actual.value === expected.value;
         case 'EQUALS':
             return parseFloat(actual.value) === parseFloat(expected.value);
+        case 'BOOLEAN':
+            // Сравниваем строки, так как значение приходит из формы как строка
+            return actual.value === String(expected.value);
         default:
             return true;
     }
