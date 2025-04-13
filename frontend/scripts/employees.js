@@ -26,9 +26,19 @@ function renderEmployees(employees) {
                     <h5 class="card-title">${emp.name}</h5>
                     <p class="card-text text-muted small">
                         Логин: ${emp.username}<br>
-                        Роль: ${emp.roles.map(r => r.name).join(', ')}<br>
-                        Права: ${emp.roles.flatMap(r => r.authorities).join(', ')}
                     </p>
+                    <div class="mb-2">
+                        <strong>Роль:</strong><br>
+                        ${emp.roles.map(role => `
+                            <span class="badge bg-primary me-1 mb-1">${role.name}</span>
+                        `).join('')}
+                    </div>
+                    <div>
+                        <strong>Права:</strong><br>
+                        ${emp.roles.flatMap(role => role.authorities).map(authority => `
+                            <span class="badge bg-secondary me-1 mb-1">${authority}</span>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         </div>
