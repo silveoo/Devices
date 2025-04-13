@@ -30,6 +30,8 @@ public class DeviceInstance {
 
     private LocalDateTime testedAt;
 
+    private Boolean anyDefects;
+
     @ElementCollection
     @CollectionTable(name = "device_instance_parameters", joinColumns = @JoinColumn(name = "device_instance_id"))
     private List<DeviceParameter> parameters = new ArrayList<>();

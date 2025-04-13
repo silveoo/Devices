@@ -110,3 +110,66 @@ body {
 #deviceTypesColumn .col {
     margin-bottom: 20px;
 }
+/* Добавьте важные стили */
+.card .btn.position-absolute {
+    display: block !important;
+    pointer-events: all !important;
+}
+
+.card:hover .btn.position-absolute {
+    opacity: 1;
+}
+
+/* Добавить в styles/custom.css */
+/* Добавить в styles/custom.css */
+/* Кнопка удаления для администратора */
+.admin-trash-btn {
+    position: absolute !important;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.admin-trash-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Обновленные стили карточек */
+.card {
+    position: relative; /* Обязательно для позиционирования кнопки */
+    overflow: visible !important; /* Предотвращает обрезку кнопки */
+    transition: all 0.3s ease;
+}
+
+.card:hover .admin-trash-btn {
+    opacity: 1;
+}
+
+.badge.bg-primary {
+    position: relative;
+    z-index: 1 !important; /* Убедимся что бейдж не перекрывает кнопку */
+}
+
+/* Стили для индикатора дефектов */
+.instance-card .badge {
+    font-size: 0.8em;
+    margin-left: 0.5rem;
+}
+
+/* Улучшенное отображение даты */
+.instance-card small.text-muted {
+    display: block;
+    margin: 0.25rem 0;
+}
+
+/* Анимация появления бэйджа */
+.instance-card .badge {
+    transition: transform 0.2s ease;
+}
+
+.instance-card:hover .badge {
+    transform: scale(1.05);
+}

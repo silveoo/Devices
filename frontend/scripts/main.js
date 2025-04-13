@@ -2,7 +2,7 @@
 const token = localStorage.getItem('token');
 if (!token) window.location.href = 'auth.html';
 
-fetch('/api/v1/device-types', {
+fetch('http://localhost:8080/api/v1/device-types', {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -98,14 +98,15 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
         return;
     }
 
+    console.log(isAdmin + "1313131231");
+
     grid.innerHTML = types.map(type => `
         <div class="col">
-            <div class="card h-100 shadow-sm position-relative">
+            <div class="card h-100 shadow-sm position-relative"  data-type-id="${type.id}">
                 ${isAdmin ? `
-                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
-                        onclick="deleteDeviceType(${type.id})"
-                        title="Удалить тип"
-                        style="z-index: 2;">
+                <button class="btn btn-danger btn-sm admin-trash-btn" 
+                        onclick="deleteDeviceType('${type.id}')"
+                        title="Удалить тип">
                     <i class="bi bi-trash"></i>
                 </button>
                 ` : ''}
@@ -173,7 +174,14 @@ function getParameterInputField(param) {
                 </select>
             `;
         case 'RANGE':
-            return `<input type="number" class="form-control" name="parameters[${param.name}]" required>`;
+            // Добавляем атрибуты min, max и step
+            return `
+                <input 
+                    type="number" 
+                    class="form-control" 
+                    name="parameters[${param.name}]" 
+                    step="any" <!-- Разрешаем дробные числа -->
+            `;
         default:
             return `<input type="text" class="form-control" name="parameters[${param.name}]" required>`;
     }
@@ -242,6 +250,7 @@ document.getElementById('createTypeForm').addEventListener('submit', async (e) =
 document.getElementById('createInstanceForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const currentTypeId = getCurrentDeviceTypeId();
 
     // Получаем testerId текущего пользователя
     let testerId;
@@ -282,7 +291,16 @@ document.getElementById('createInstanceForm').addEventListener('submit', async (
 
         if (response.ok) {
             showNotification('Экземпляр создан!', 'success');
-            loadDeviceTypes();
+
+            const isSplitViewActive = document.getElementById('splitViewContainer').style.display === 'block';
+
+            if (isSplitViewActive) {
+                // Обновляем список экземпляров для текущего типа
+                await showInstances(currentTypeId);
+            } else {
+                // Обновляем общий список типов
+                loadDeviceTypes();
+            }
 
             // Исправляем закрытие
             const modal = bootstrap.Modal.getInstance(document.getElementById('createInstanceModal'));
@@ -292,6 +310,11 @@ document.getElementById('createInstanceForm').addEventListener('submit', async (
         console.error('Ошибка:', error);
     }
 });
+
+function getCurrentDeviceTypeId() {
+    const splitViewCard = document.querySelector('#deviceTypesColumn .card');
+    return splitViewCard ? splitViewCard.dataset.typeId : null;
+}
 
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notificationContainer');
@@ -329,12 +352,15 @@ async function checkUserRole() {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const user = await response.json();
-        isAdmin = user.roles?.some(role => role.name === 'ADMIN');
+        isAdmin = user.roles?.some(role =>
+            role.name === 'ADMIN' ||  // Основная проверка
+            (role.authorities && role.authorities.some(a => a.name === 'ADMIN'))) // Проверка authorities
 
-        // Показываем элементы для админа
+        console.log('Is admin after check:', isAdmin); // Добавляем лог
+
         if (isAdmin) {
-            document.getElementById('employeesNavLink').style.display = 'block';
             document.getElementById('createTypeBtn').style.display = 'block';
+            document.getElementById('employeesNavLink').style.display = 'block';
         }
 
         // Подсветка активной страницы
@@ -351,6 +377,7 @@ async function checkUserRole() {
         console.error('Ошибка проверки роли:', error);
     }
 }
+
 async function showInstances(typeId) {
     try {
         const response = await fetch(`http://localhost:8080/api/v1/device-instances/by-type/?deviceTypeId=${typeId}`, {
@@ -441,6 +468,17 @@ function formatParameterValue(param) {
             return `${param.minValue} - ${param.maxValue}`;
         case 'DEVIATION':
             return `${param.value} ±${param.tolerancePercent}%`;
+        case 'ENUM':
+            // Обработка разных форматов allowedValues
+            const values = param.allowedValues;
+            if (Array.isArray(values)) {
+                return values.join(', ') || 'N/A';
+            } else if (typeof values === 'string') {
+                // Если приходит строка, разбиваем по запятым
+                return values.split(',').map(v => v.trim()).join(', ') || 'N/A';
+            } else {
+                return 'N/A';
+            }
         default:
             return param.value || 'N/A';
     }
@@ -451,7 +489,8 @@ function checkParameterCompliance(expected, actual) {
 
     switch (expected.type) {
         case 'RANGE':
-            return actual.value >= expected.minValue && actual.value <= expected.maxValue;
+            const numericValue = parseFloat(actual.value); // Преобразуем в число
+            return numericValue >= expected.minValue && numericValue <= expected.maxValue;
         case 'DEVIATION':
             const deviation = Math.abs(actual.value - expected.value);
             const allowedDeviation = expected.value * (expected.tolerancePercent / 100);
@@ -485,12 +524,32 @@ async function exitSplitView() {
 }
 
 function renderInstanceCard(instance) {
+    // Форматирование даты
+    const testedDate = instance.testedAt ? new Date(instance.testedAt) : null;
+    const formattedDate = testedDate
+        ? testedDate.toLocaleDateString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+        : 'Дата не указана';
+
+    // Определение статуса дефектов
+    const hasDefects = instance.hasOwnProperty('anyDefects')
+        ? instance.anyDefects
+        : 'unknown';
+
     return `
         <div class="instance-card">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <span class="fw-bold">Экземпляр #${instance.id}</span>
-                    <small class="text-muted">Тест проведен: ${new Date().toLocaleDateString()}</small>
+                    <small class="text-muted">Тест проведен: ${formattedDate}</small>
+                    <span class="badge ${hasDefects === 'unknown' ? 'bg-secondary' : hasDefects ? 'bg-danger' : 'bg-success'} ms-2">
+                        ${hasDefects === 'unknown' ? 'Не проверено' : hasDefects ? 'Есть дефекты' : 'Без дефектов'}
+                    </span>
                 </div>
                 <div>
                     <button class="btn btn-sm btn-outline-primary instance-details-toggle" 

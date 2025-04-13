@@ -47,9 +47,12 @@ public class DeviceInstanceService {
         instance.setDeviceType(type);
         instance.setParameters(request.getParameters());
         instance.setTester(currentTester);
-        repository.save(instance);
+
 
         boolean isValid = deviceValidationService.validate(type, instance);
+        instance.setAnyDefects(!isValid);
+        repository.save(instance);
+
         return ResponseEntity.ok(Map.of("instance", instance, "valid", isValid));
     }
 
@@ -60,7 +63,6 @@ public class DeviceInstanceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device type not found"));
         Tester tester = instance.getTester();
 
-        // Формируем ожидаемые параметры (с учетом типа RANGE)
         Map<String, String> expectedParameters = type.getParameters().stream()
                 .filter(Objects::nonNull)
                 .filter(template -> template.getName() != null)
@@ -118,7 +120,6 @@ public class DeviceInstanceService {
             }
         }
 
-        // Формируем отчет
         DeviceInstanceReportDto report = new DeviceInstanceReportDto();
         report.setInstanceId(instanceId);
         report.setDeviceName(deviceName);
@@ -131,11 +132,9 @@ public class DeviceInstanceService {
     }
 
     private Tester getCurrentTester() throws AccessDeniedException {
-        // Получаем аутентификацию из SecurityContext
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        // Ищем доменную сущность User по имени
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
