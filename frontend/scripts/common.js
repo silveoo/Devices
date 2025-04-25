@@ -49,6 +49,8 @@ async function checkUserRole() {
             if (createTypeBtn) createTypeBtn.style.display = 'block';
             const employeesNavLink = document.getElementById('employeesNavLink');
             if (employeesNavLink) employeesNavLink.style.display = 'block';
+            const deleteTypeBtn = document.getElementById('deleteTypeBtn');
+            if(deleteTypeBtn) deleteTypeBtn.style.display = 'block';
         }
 
         // Подсветка активной страницы

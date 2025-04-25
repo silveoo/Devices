@@ -4,6 +4,19 @@
     cursor: pointer;
 }
 
+/* Убедитесь, что контент внутри карточки не выходит за границы */
+.card-body {
+    display: flex;
+    flex-direction: column; /* Вертикальное выравнивание */
+    justify-content: space-between; /* Размещение контента по вертикали */
+    padding: 1rem; /* Поля вокруг контента */
+}
+
+/* Выровняйте кнопки внизу */
+.card-body > div:last-child {
+    margin-top: auto; /* Переместить кнопки вниз */
+}
+
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);

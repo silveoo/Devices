@@ -92,12 +92,10 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
     const grid = isSplitView
         ? document.getElementById('deviceTypesColumn')
         : document.getElementById('deviceTypesGrid');
-
     if (!types || types.length === 0) {
         grid.innerHTML = '<div class="text-muted">Нет типов устройств</div>';
         return;
     }
-
     grid.innerHTML = types.map(type => `
         <div class="col">
             <div class="card h-100 shadow-sm position-relative" data-type-id="${type.id}">
@@ -116,7 +114,6 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                         <span class="badge bg-primary">${type.parameters?.length || 0}</span>
                     </div>
                     <p class="card-text text-muted small">${type.description || 'Нет описания'}</p>
-                    
                     <!-- Блок параметров теперь отображается только в split view -->
                     ${isSplitView ? `
                     <div class="mt-3">
@@ -133,8 +130,8 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                         </ul>
                     </div>
                     ` : ''}
-                    
-                    <div class="mt-3 d-grid gap-2">
+                    <!-- Кнопки всегда будут внизу -->
+                    <div class="mt-auto d-grid gap-2">
                         <button class="btn btn-outline-primary" 
                                 onclick="createInstance('${type.id}')">
                             <i class="bi bi-plus-lg"></i> Экземпляр
