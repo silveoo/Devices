@@ -24,6 +24,11 @@ public class DeviceType {
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "device_type_parameters", joinColumns = @JoinColumn(name = "device_type_id"))
+    @CollectionTable(
+            name = "device_type_parameters",
+            joinColumns = @JoinColumn(name = "device_type_id"),
+            indexes = @Index(name = "idx_device_type_parameters_device_type_id", columnList = "device_type_id")
+    )
     private List<DeviceParameterTemplate> parameters = new ArrayList<>();
+
 }
