@@ -87,6 +87,66 @@ async function loadDeviceTypes(searchQuery = '') {
     }
 }
 
+function renderDefectChart(instances) {
+    const ctx = document.getElementById('defectTrendChart').getContext('2d');
+    const sorted = [...instances].sort((a, b) => new Date(a.testedAt || 0) - new Date(b.testedAt || 0));
+
+    const labels = sorted.map(inst => {
+        const date = new Date(inst.testedAt);
+        return isNaN(date.getTime()) ? '—' : date.toLocaleDateString('ru-RU', {
+            day: '2-digit', month: '2-digit'
+        });
+    });
+
+    const data = sorted.map(inst => inst.anyDefects ? 'Дефект' : 'ОК');
+
+    if (window.defectChart) window.defectChart.destroy();
+
+    window.defectChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Наличие дефектов',
+                data: data,
+                fill: false,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: data.map(val => val.trim() === 'Дефект' ? 'red' : 'green'),
+                borderColor: '#007bff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
+            scales: {
+                y: {
+                    type: 'category',
+                    labels: ['ОК', 'Дефект'],
+                    title: {
+                        display: true,
+                        text: 'Состояние'
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.raw.trim() === 'Дефект' ? 'Есть дефекты' : 'Без дефектов'
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+
 // Отображение типов
 function renderDeviceTypes(types, isAdmin, isSplitView = false) {
     const grid = isSplitView
@@ -693,6 +753,7 @@ function renderInstancesColumn(instances) {
     container.querySelectorAll('.instance-details-toggle').forEach(btn => {
         btn.addEventListener('click', () => toggleDetails(btn.dataset.instanceId));
     });
+    renderDefectChart(instances);
 }
 
 async function generateReport(instanceId, deviceName) {

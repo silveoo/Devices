@@ -15,13 +15,10 @@ import java.util.Optional;
 public interface DeviceTypeRepository extends JpaRepository<DeviceType, Long> {
     Optional<DeviceType> findByName(String name);
 
-    // Кастомное каскадное удаление
     @Transactional
     default void deleteByIdCascade(Long id) {
-        // 1. Удаляем все связанные DeviceInstance и их параметры
         deleteRelatedDeviceInstances(id);
 
-        // 2. Удаляем сам DeviceType (его parameters удалятся каскадно)
         deleteById(id);
     }
 
