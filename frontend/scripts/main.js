@@ -174,7 +174,6 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                         <span class="badge bg-primary">${type.parameters?.length || 0}</span>
                     </div>
                     <p class="card-text text-muted small">${type.description || 'Нет описания'}</p>
-                    <!-- Блок параметров теперь отображается только в split view -->
                     ${isSplitView ? `
                     <div class="mt-3">
                         <h6 class="mb-2"><i class="bi bi-list-check"></i> Параметры:</h6>
@@ -190,7 +189,6 @@ function renderDeviceTypes(types, isAdmin, isSplitView = false) {
                         </ul>
                     </div>
                     ` : ''}
-                    <!-- Кнопки всегда будут внизу -->
                     <div class="mt-auto d-grid gap-2">
                         <button class="btn btn-outline-primary" 
                                 onclick="createInstance('${type.id}')">
@@ -503,17 +501,16 @@ async function checkUserRole() {
         });
         const user = await response.json();
         isAdmin = user.roles?.some(role =>
-            role.name === 'ADMIN' ||  // Основная проверка
-            (role.authorities && role.authorities.some(a => a.name === 'ADMIN'))) // Проверка authorities
+            role.name === 'ADMIN' ||
+            (role.authorities && role.authorities.some(a => a.name === 'ADMIN')))
 
-        console.log('Is admin after check:', isAdmin); // Добавляем лог
+        console.log('Is admin after check:', isAdmin);
 
         if (isAdmin) {
             document.getElementById('createTypeBtn').style.display = 'block';
             document.getElementById('employeesNavLink').style.display = 'block';
         }
 
-        // Подсветка активной страницы
         const currentPage = window.location.pathname.split('/').pop();
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
@@ -623,12 +620,10 @@ function formatParameterValue(param) {
         case 'DEVIATION':
             return `${param.value} ±${param.tolerancePercent}%`;
         case 'ENUM':
-            // Обработка разных форматов allowedValues
             const values = param.allowedValues;
             if (Array.isArray(values)) {
                 return values.join(', ') || 'N/A';
             } else if (typeof values === 'string') {
-                // Если приходит строка, разбиваем по запятым
                 return values.split(',').map(v => v.trim()).join(', ') || 'N/A';
             } else {
                 return 'N/A';
@@ -664,7 +659,6 @@ function checkParameterCompliance(expected, actual) {
         case 'EQUALS':
             return parseFloat(actual.value) === parseFloat(expected.value);
         case 'BOOLEAN':
-            // Сравниваем строки, так как значение приходит из формы как строка
             return actual.value === String(expected.value);
         default:
             return true;
@@ -691,7 +685,6 @@ async function exitSplitView() {
 }
 
 function renderInstanceCard(instance) {
-    // Форматирование даты
     const testedDate = instance.testedAt ? new Date(instance.testedAt) : null;
     const formattedDate = testedDate
         ? testedDate.toLocaleDateString('ru-RU', {
@@ -703,7 +696,6 @@ function renderInstanceCard(instance) {
         })
         : 'Дата не указана';
 
-    // Определение статуса дефектов
     const hasDefects = instance.hasOwnProperty('anyDefects')
         ? instance.anyDefects
         : 'unknown';
@@ -733,28 +725,75 @@ function renderInstanceCard(instance) {
 }
 
 function renderInstancesColumn(instances) {
+    instances.sort((a, b) => new Date(b.testedAt || 0) - new Date(a.testedAt || 0));
+
     const container = document.getElementById('instancesColumn');
+
     container.innerHTML = `
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title mb-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">
                     <i class="bi bi-list-ul"></i> Экземпляры устройства
                 </h5>
+                <select id="instanceSortSelect" class="form-select form-select-sm" style="min-width: 220px; max-width: 240px;">
+                    <option value="newest">Сначала новые</option>
+                    <option value="oldest">Сначала старые</option>
+                    <option value="defective">Сначала с дефектами</option>
+                    <option value="ok">Сначала без дефектов</option>
+                </select>
+            </div>
+            <div id="instanceCardsContainer">
                 ${instances.map(instance => `
                     <div class="card mb-3">
                         ${renderInstanceCard(instance)}
                     </div>
-                `).join('')}
+                    `).join('')}
+                </div>
             </div>
         </div>
     `;
 
-    // Добавляем обработчики для раскрытия деталей
+
+    // Добавляем обработчики раскрытия
     container.querySelectorAll('.instance-details-toggle').forEach(btn => {
         btn.addEventListener('click', () => toggleDetails(btn.dataset.instanceId));
     });
+
+    // Обработка сортировки по select
+    document.getElementById('instanceSortSelect').addEventListener('change', (e) => {
+        const mode = e.target.value;
+        const sorted = [...instances]; // копируем
+
+        if (mode === 'newest') {
+            sorted.sort((a, b) => new Date(b.testedAt || 0) - new Date(a.testedAt || 0));
+        } else if (mode === 'oldest') {
+            sorted.sort((a, b) => new Date(a.testedAt || 0) - new Date(b.testedAt || 0));
+        } else if (mode === 'defective') {
+            sorted.sort((a, b) => (b.anyDefects === true ? 1 : 0) - (a.anyDefects === true ? 1 : 0));
+        } else if (mode === 'ok') {
+            sorted.sort((a, b) => (a.anyDefects === true ? 1 : 0) - (b.anyDefects === true ? 1 : 0));
+        }
+
+        // Перерисовываем только карточки
+        document.getElementById('instanceCardsContainer').innerHTML = sorted.map(instance => `
+            <div class="card mb-3">
+                ${renderInstanceCard(instance)}
+            </div>
+        `).join('');
+
+        // Повторно навешиваем раскрытие
+        container.querySelectorAll('.instance-details-toggle').forEach(btn => {
+            btn.addEventListener('click', () => toggleDetails(btn.dataset.instanceId));
+        });
+
+        // Перерисовываем график
+        renderDefectChart(sorted);
+    });
+
     renderDefectChart(instances);
 }
+
 
 async function generateReport(instanceId, deviceName) {
     try {

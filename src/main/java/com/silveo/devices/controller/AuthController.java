@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
@@ -52,8 +53,10 @@ public class AuthController {
 
     @GetMapping("/users/me")
     @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Получение информации об авторизованном пользователе")
     public ResponseEntity<User> getCurrentUser(Authentication auth) {
         log.info("getting current user");
+        if (auth == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authenticated");
         String username = auth.getName();
         User user = userRepository.findByUsername(username).orElseThrow();
         return ResponseEntity.ok(user);
