@@ -46,7 +46,7 @@ public class TesterService {
         testerRepository.save(tester);
 
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            mailService.sendAccountEmail(dto.getEmail(), dto.getUsername(), dto.getPassword());
+            mailService.sendAccountEmail(dto.getEmail(), dto.getUsername(), dto.getPassword(), dto.getName());
         }
 
         return ResponseEntity.ok(tester);
