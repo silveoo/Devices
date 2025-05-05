@@ -15,3 +15,14 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sqlveo@gmail.com
+    password: ybmo etqy gxjf amzd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

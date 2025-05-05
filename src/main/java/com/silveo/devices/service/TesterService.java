@@ -30,6 +30,7 @@ public class TesterService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final MailService mailService;
 
     public ResponseEntity<Tester> createTester(TesterCreationDto dto) {
 
@@ -43,6 +44,11 @@ public class TesterService {
         tester.setName(dto.getName());
         tester.setUser(user);
         testerRepository.save(tester);
+
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            mailService.sendAccountEmail(dto.getEmail(), dto.getUsername(), dto.getPassword());
+        }
+
         return ResponseEntity.ok(tester);
     }
 
